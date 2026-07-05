@@ -17,8 +17,9 @@ void main() {
       expect(EnvConfig.storageVehiclePhotosBucket, 'vehicle-photos');
     });
 
-    test('supabaseUrlForLogs does not throw when url is null', () {
-      expect(EnvConfig.supabaseUrlForLogs, isNull);
+    test('supabaseUrlForLogs returns redacted url after load', () async {
+      await EnvConfig.load();
+      expect(EnvConfig.supabaseUrlForLogs, contains('supabase.co'));
     });
   });
 }
