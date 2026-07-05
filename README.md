@@ -55,10 +55,16 @@ lib/
 ├── features/
 │   ├── auth/                 # Login, password reset
 │   ├── dashboard/            # Overview & stats
-│   ├── vehicles/             # Fleet management
-│   ├── rentals/              # Rental agreements
-│   ├── services/             # Service orders
-│   ├── trading/              # Vehicle sales
+│   ├── rentals/              # Rental agreements (Phase 1)
+│   ├── cashbook/             # Income & expense ledger (Phase 1)
+│   ├── rental_periods/       # Period closing (Phase 1)
+│   ├── vehicle_profitability/# Per-vehicle profit (Phase 1)
+│   ├── customers/            # Customer management (Phase 1)
+│   ├── drivers/              # Driver registry (Phase 1)
+│   ├── documents/            # File attachments (Phase 1)
+│   ├── vehicles/             # Fleet inventory
+│   ├── services/             # Workshop — optional (Phase 2)
+│   ├── trading/                # Vehicle sales (Phase 2)
 │   ├── reports/              # Analytics (admin)
 │   ├── users/                # User management (admin)
 │   ├── settings/             # App settings
@@ -93,6 +99,7 @@ lib/
    ```
    supabase/migrations/001_initial_schema.sql
    supabase/migrations/002_financial_operations_schema.sql
+   supabase/migrations/003_module_priorities.sql
    ```
 6. Run the app:
    ```bash
@@ -105,6 +112,14 @@ Without Supabase configuration, the app runs in demo mode:
 - Use any email/password to sign in
 - Include `admin` in the email for Administrator role
 - All other emails get Employee role
+
+## Development Roadmap
+
+See [ROADMAP.md](ROADMAP.md) for the full phased development plan.
+
+**Current phase (Phase 1):** Rentals, Cashbook, Rental Period Closing, Vehicle Profitability, Customers, Drivers, Documents.
+
+**Secondary (deferred UI):** Workshop (`service_orders`), Trading, Fleet management screens.
 
 ## Database Schema
 
@@ -123,6 +138,15 @@ Without Supabase configuration, the app runs in demo mode:
 - `expenses` — vehicle-specific costs (linked to vehicles, optional transaction)
 - `documents` — file attachments for vehicles, customers, rentals, or transactions
 - `reports` — saved and generated business reports
+
+### Module priorities (`003_module_priorities.sql`)
+- `rental_period_closings` — audit log for period closing
+- `close_rental_period()` — locks period and records totals
+- `cashbook_entries` (view) — ledger with running XAF balance
+- `vehicle_profitability` (view) — per-vehicle income vs expense
+- `service_orders` — vehicle link now **optional** (workshop is secondary)
+- `documents` — also attachable to `rental_periods`
+- `transactions.is_cashbook_posted` — cashbook posting flag
 
 ### Relationships
 ```

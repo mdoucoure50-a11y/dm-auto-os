@@ -7,6 +7,7 @@ import '../../../../core/constants/breakpoints.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/permissions/permission_guard.dart';
 import '../../../../core/responsive/responsive_layout.dart';
+import '../../../../core/constants/app_modules.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../../providers/auth_provider.dart';
 
@@ -53,8 +54,6 @@ class _MobileShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final destinations = _visibleDestinations(ref);
-
     return Scaffold(
       appBar: AppBar(
         title: Text(_titleForRoute(currentRoute)),
@@ -64,26 +63,35 @@ class _MobileShell extends ConsumerWidget {
       ),
       drawer: _AppDrawer(
         currentRoute: currentRoute,
-        destinations: destinations,
+        allDestinations: _allVisibleDestinations(ref),
         user: user,
       ),
       body: child,
-      bottomNavigationBar: destinations.length <= 5
-          ? NavigationBar(
-              selectedIndex: _selectedIndex(destinations, currentRoute),
-              onDestinationSelected: (index) =>
-                  context.go(destinations[index].route),
-              destinations: destinations
-                  .map(
-                    (d) => NavigationDestination(
-                      icon: Icon(d.icon),
-                      selectedIcon: Icon(d.selectedIcon),
-                      label: d.label,
-                    ),
-                  )
-                  .toList(),
-            )
-          : null,
+      bottomNavigationBar: _buildCompactNav(context, ref, currentRoute),
+    );
+  }
+
+  Widget? _buildCompactNav(BuildContext context, WidgetRef ref, String route) {
+    final compact = _visibleDestinations(
+      ref,
+      onlyCompact: true,
+    );
+    if (compact.isEmpty) return null;
+
+    final selectedIndex = _selectedIndex(compact, route);
+
+    return NavigationBar(
+      selectedIndex: selectedIndex.clamp(0, compact.length - 1),
+      onDestinationSelected: (index) => context.go(compact[index].route),
+      destinations: compact
+          .map(
+            (d) => NavigationDestination(
+              icon: Icon(d.icon),
+              selectedIcon: Icon(d.selectedIcon),
+              label: d.label,
+            ),
+          )
+          .toList(),
     );
   }
 }
@@ -101,16 +109,15 @@ class _TabletShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final destinations = _visibleDestinations(ref);
-    final selectedIndex = _selectedIndex(destinations, currentRoute);
+    final primary = _visibleDestinations(ref, tier: ModuleTier.primary);
 
     return Scaffold(
       body: Row(
         children: [
           NavigationRail(
-            selectedIndex: selectedIndex,
+            selectedIndex: _selectedIndex(primary, currentRoute),
             onDestinationSelected: (index) =>
-                context.go(destinations[index].route),
+                context.go(primary[index].route),
             labelType: NavigationRailLabelType.selected,
             leading: Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
@@ -129,7 +136,7 @@ class _TabletShell extends ConsumerWidget {
                 ),
               ),
             ),
-            destinations: destinations
+            destinations: primary
                 .map(
                   (d) => NavigationRailDestination(
                     icon: Icon(d.icon),
@@ -167,8 +174,10 @@ class _DesktopShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final destinations = _visibleDestinations(ref);
-    final selectedIndex = _selectedIndex(destinations, currentRoute);
+    final primary = _visibleDestinations(ref, tier: ModuleTier.primary);
+    final secondary = _visibleDestinations(ref, tier: ModuleTier.secondary);
+    final admin = _visibleDestinations(ref, tier: ModuleTier.admin);
+    final all = [...primary, ...secondary, ...admin];
 
     return Scaffold(
       body: Row(
@@ -176,9 +185,10 @@ class _DesktopShell extends ConsumerWidget {
           NavigationRail(
             extended: context.screenWidth >= Breakpoints.desktop,
             minExtendedWidth: Breakpoints.extendedNavigationRailWidth,
-            selectedIndex: selectedIndex,
-            onDestinationSelected: (index) =>
-                context.go(destinations[index].route),
+            selectedIndex: _selectedIndex(all, currentRoute),
+            onDestinationSelected: (index) {
+              if (index < all.length) context.go(all[index].route);
+            },
             leading: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -211,7 +221,7 @@ class _DesktopShell extends ConsumerWidget {
                 ),
               ),
             ),
-            destinations: destinations
+            destinations: all
                 .map(
                   (d) => NavigationRailDestination(
                     icon: Icon(d.icon),
@@ -265,12 +275,12 @@ class _ShellHeader extends StatelessWidget {
 class _AppDrawer extends StatelessWidget {
   const _AppDrawer({
     required this.currentRoute,
-    required this.destinations,
+    required this.allDestinations,
     required this.user,
   });
 
   final String currentRoute;
-  final List<NavItem> destinations;
+  final List<_DrawerSection> allDestinations;
   final dynamic user;
 
   @override
@@ -288,9 +298,21 @@ class _AppDrawer extends StatelessWidget {
           ),
           Expanded(
             child: ListView(
-              children: destinations
-                  .map(
-                    (d) => ListTile(
+              children: [
+                for (final section in allDestinations) ...[
+                  if (section.title != null)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                      child: Text(
+                        section.title!,
+                        style: context.textTheme.labelMedium?.copyWith(
+                          color: context.colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  for (final d in section.items)
+                    ListTile(
                       leading: Icon(
                         currentRoute == d.route ? d.selectedIcon : d.icon,
                       ),
@@ -301,14 +323,21 @@ class _AppDrawer extends StatelessWidget {
                         context.go(d.route);
                       },
                     ),
-                  )
-                  .toList(),
+                ],
+              ],
             ),
           ),
         ],
       ),
     );
   }
+}
+
+class _DrawerSection {
+  const _DrawerSection({this.title, required this.items});
+
+  final String? title;
+  final List<NavItem> items;
 }
 
 class _UserAvatarMenu extends ConsumerWidget {
@@ -384,10 +413,15 @@ class NavItem {
   final IconData selectedIcon;
 }
 
-List<NavItem> _visibleDestinations(WidgetRef ref) {
-  final all = AppNavigation.destinations;
-  return all
+List<NavItem> _visibleDestinations(
+  WidgetRef ref, {
+  ModuleTier? tier,
+  bool onlyCompact = false,
+}) {
+  return AppNavigation.destinations
       .where((dest) {
+        if (tier != null && dest.tier != tier) return false;
+        if (onlyCompact && !dest.showInCompactNav) return false;
         if (dest.permission == null) return true;
         final permission = AppNavigation.permissionFromCode(dest.permission);
         if (permission == null) return true;
@@ -402,6 +436,23 @@ List<NavItem> _visibleDestinations(WidgetRef ref) {
         ),
       )
       .toList();
+}
+
+List<_DrawerSection> _allVisibleDestinations(WidgetRef ref) {
+  return [
+    _DrawerSection(
+      title: 'Operations',
+      items: _visibleDestinations(ref, tier: ModuleTier.primary),
+    ),
+    _DrawerSection(
+      title: 'More',
+      items: _visibleDestinations(ref, tier: ModuleTier.secondary),
+    ),
+    _DrawerSection(
+      title: 'Administration',
+      items: _visibleDestinations(ref, tier: ModuleTier.admin),
+    ),
+  ].where((section) => section.items.isNotEmpty).toList();
 }
 
 int _selectedIndex(List<NavItem> destinations, String currentRoute) {

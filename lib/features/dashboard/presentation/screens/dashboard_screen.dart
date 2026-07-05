@@ -183,31 +183,31 @@ class _QuickActions extends StatelessWidget {
           permission: AppPermission.createRental,
           child: _ActionChip(
             label: 'New Rental',
-            icon: Icons.add,
+            icon: Icons.key,
             onTap: () {},
           ),
         ),
         PermissionGuard(
-          permission: AppPermission.createVehicle,
+          permission: AppPermission.manageCashbook,
           child: _ActionChip(
-            label: 'Add Vehicle',
-            icon: Icons.directions_car,
+            label: 'Cashbook Entry',
+            icon: Icons.account_balance_wallet,
             onTap: () {},
           ),
         ),
         PermissionGuard(
-          permission: AppPermission.createService,
+          permission: AppPermission.manageRentalPeriods,
           child: _ActionChip(
-            label: 'New Service',
-            icon: Icons.build,
+            label: 'Close Period',
+            icon: Icons.event_available,
             onTap: () {},
           ),
         ),
         PermissionGuard(
-          permission: AppPermission.createSale,
+          permission: AppPermission.manageCustomers,
           child: _ActionChip(
-            label: 'Record Sale',
-            icon: Icons.sell,
+            label: 'Add Customer',
+            icon: Icons.person_add,
             onTap: () {},
           ),
         ),

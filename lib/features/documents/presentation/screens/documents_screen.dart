@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/constants/app_modules.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/permissions/app_permission.dart';
 import '../../../../core/permissions/permission_guard.dart';
 import '../../../../core/responsive/responsive_layout.dart';
 import '../../../../core/widgets/empty_state.dart';
 
-/// Workshop / service orders — optional secondary module (Phase 2).
-class ServicesScreen extends ConsumerWidget {
-  const ServicesScreen({super.key});
+class DocumentsScreen extends ConsumerWidget {
+  const DocumentsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final workshop = AppModule.workshopModule;
-
     return ContentContainer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -27,9 +23,9 @@ class ServicesScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Workshop', style: context.textTheme.titleLarge),
+                    Text('Documents', style: context.textTheme.titleLarge),
                     Text(
-                      workshop.description ?? 'Optional service orders',
+                      'Contracts, receipts, and closing reports',
                       style: context.textTheme.bodySmall?.copyWith(
                         color: context.colorScheme.onSurfaceVariant,
                       ),
@@ -38,28 +34,22 @@ class ServicesScreen extends ConsumerWidget {
                 ),
               ),
               PermissionGuard(
-                permission: AppPermission.createService,
+                permission: AppPermission.manageDocuments,
                 child: FilledButton.icon(
                   onPressed: () {},
-                  icon: const Icon(Icons.add),
-                  label: const Text('New Order'),
+                  icon: const Icon(Icons.upload_file),
+                  label: const Text('Upload'),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Chip(
-            avatar: const Icon(Icons.info_outline, size: 16),
-            label: const Text('Secondary module — Phase 2 development'),
-            visualDensity: VisualDensity.compact,
-          ),
           const SizedBox(height: 16),
           const Expanded(
             child: EmptyState(
-              title: 'No service orders',
+              title: 'No documents',
               subtitle:
-                  'Workshop jobs are optional. Vehicle assignment is not required.',
-              icon: Icons.build_outlined,
+                  'Attach documents to vehicles, customers, rentals, or transactions.',
+              icon: Icons.folder_outlined,
             ),
           ),
         ],

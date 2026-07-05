@@ -4,7 +4,12 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/cashbook/presentation/screens/cashbook_screen.dart';
+import '../../features/customers/presentation/screens/customers_screen.dart';
 import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
+import '../../features/documents/presentation/screens/documents_screen.dart';
+import '../../features/drivers/presentation/screens/drivers_screen.dart';
+import '../../features/rental_periods/presentation/screens/rental_periods_screen.dart';
 import '../../features/rentals/presentation/screens/rentals_screen.dart';
 import '../../features/reports/presentation/screens/reports_screen.dart';
 import '../../features/services/presentation/screens/services_screen.dart';
@@ -12,6 +17,7 @@ import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/shell/presentation/screens/app_shell.dart';
 import '../../features/trading/presentation/screens/trading_screen.dart';
 import '../../features/users/presentation/screens/users_screen.dart';
+import '../../features/vehicle_profitability/presentation/screens/vehicle_profitability_screen.dart';
 import '../../features/vehicles/presentation/screens/vehicles_screen.dart';
 import '../../providers/auth_provider.dart';
 import '../permissions/permission_guard.dart';
@@ -40,7 +46,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         return AppRoutes.dashboard;
       }
 
-      // Permission check for protected routes
       if (isAuthenticated && !isPublicRoute) {
         final destination = AppNavigation.destinations
             .where((d) => d.route == state.matchedLocation)
@@ -81,13 +86,6 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
-            path: AppRoutes.vehicles,
-            name: 'vehicles',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: VehiclesScreen(),
-            ),
-          ),
-          GoRoute(
             path: AppRoutes.rentals,
             name: 'rentals',
             pageBuilder: (context, state) => const NoTransitionPage(
@@ -95,8 +93,57 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
-            path: AppRoutes.services,
-            name: 'services',
+            path: AppRoutes.cashbook,
+            name: 'cashbook',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: CashbookScreen(),
+            ),
+          ),
+          GoRoute(
+            path: AppRoutes.rentalPeriods,
+            name: 'rentalPeriods',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: RentalPeriodsScreen(),
+            ),
+          ),
+          GoRoute(
+            path: AppRoutes.vehicleProfitability,
+            name: 'vehicleProfitability',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: VehicleProfitabilityScreen(),
+            ),
+          ),
+          GoRoute(
+            path: AppRoutes.customers,
+            name: 'customers',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: CustomersScreen(),
+            ),
+          ),
+          GoRoute(
+            path: AppRoutes.drivers,
+            name: 'drivers',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: DriversScreen(),
+            ),
+          ),
+          GoRoute(
+            path: AppRoutes.documents,
+            name: 'documents',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: DocumentsScreen(),
+            ),
+          ),
+          GoRoute(
+            path: AppRoutes.vehicles,
+            name: 'vehicles',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: VehiclesScreen(),
+            ),
+          ),
+          GoRoute(
+            path: AppRoutes.workshop,
+            name: 'workshop',
             pageBuilder: (context, state) => const NoTransitionPage(
               child: ServicesScreen(),
             ),
