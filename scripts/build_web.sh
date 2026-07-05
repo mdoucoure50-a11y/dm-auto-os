@@ -7,7 +7,7 @@ OUTPUT="${OUTPUT:-build/web}"
 
 if [[ ! -f "$ENV_FILE" ]]; then
   echo "Error: $ENV_FILE not found."
-  echo "Create env.production.json with SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY."
+  echo "Create env.production.json from env.production.json.example with SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY."
   exit 1
 fi
 

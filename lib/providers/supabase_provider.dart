@@ -5,6 +5,7 @@ import '../core/config/env_config.dart';
 import '../data/services/supabase_auth_service.dart';
 import '../data/services/supabase_client_service.dart';
 import '../data/services/supabase_database_service.dart';
+import '../data/services/supabase_health_check.dart';
 import '../data/services/supabase_storage_service.dart';
 
 // ---------------------------------------------------------------------------
@@ -59,6 +60,7 @@ final supabaseEnvProvider = Provider<SupabaseEnvInfo>((ref) {
     url: EnvConfig.supabaseUrlForLogs,
     documentsBucket: EnvConfig.storageDocumentsBucket,
     vehiclePhotosBucket: EnvConfig.storageVehiclePhotosBucket,
+    health: clientService.healthResult,
   );
 });
 
@@ -70,6 +72,7 @@ class SupabaseEnvInfo {
     this.url,
     required this.documentsBucket,
     required this.vehiclePhotosBucket,
+    this.health,
   });
 
   final bool isConfigured;
@@ -77,4 +80,5 @@ class SupabaseEnvInfo {
   final String? url;
   final String documentsBucket;
   final String vehiclePhotosBucket;
+  final SupabaseHealthResult? health;
 }

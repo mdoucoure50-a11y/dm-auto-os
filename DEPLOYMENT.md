@@ -2,6 +2,8 @@
 
 > **Setup credentials first:** See [SETUP.md](SETUP.md) for exactly where to place `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` for local and production environments.
 
+> **Integration reference:** See [docs/SUPABASE.md](docs/SUPABASE.md) for Auth, PostgreSQL, and Storage configuration.
+
 All secrets are supplied via **environment variables**. No credentials are hardcoded in the application.
 
 ## Required environment variables
@@ -14,8 +16,9 @@ All secrets are supplied via **environment variables**. No credentials are hardc
 | `SUPABASE_STORAGE_VEHICLE_PHOTOS_BUCKET` | No | Default: `vehicle-photos` |
 
 Placeholders are in:
-- `env.example.json`
 - `env.local.json.example`
+- `env.production.json.example`
+- `env.example.json`
 - `assets/.env.example`
 
 ## Local development
@@ -79,7 +82,7 @@ Both buckets are **private**; access uses authenticated RLS and signed URLs.
 ### Web
 
 ```bash
-cp env.example.json env.production.json
+cp env.production.json.example env.production.json
 # Add production Supabase credentials to env.production.json
 
 chmod +x scripts/build_web.sh
@@ -126,7 +129,7 @@ flutter build web --release --dart-define-from-file=env.production.json
 
 ## Security notes
 
-- The **anon key** is safe to embed in client apps; access is enforced by RLS.
+- The **publishable key** is safe to embed in client apps; access is enforced by RLS.
 - Never expose the **service role key** in the Flutter app.
 - All tables use RLS; soft-deleted records are hidden from non-administrators.
 - Storage buckets are private; use signed URLs for downloads.

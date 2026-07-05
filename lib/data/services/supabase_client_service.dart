@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart' as supa;
 import '../../core/config/env_config.dart';
 import '../../core/errors/app_exception.dart';
 import '../../core/utils/logger.dart';
+import 'supabase_health_check.dart';
 
 /// Initializes and exposes the Supabase client singleton.
 class SupabaseClientService {
@@ -12,9 +13,11 @@ class SupabaseClientService {
 
   bool _initialized = false;
   bool _connected = false;
+  SupabaseHealthResult? _healthResult;
 
   bool get isInitialized => _initialized;
   bool get isConnected => _connected;
+  SupabaseHealthResult? get healthResult => _healthResult;
 
   /// Active Supabase client. Throws if not connected.
   supa.SupabaseClient get client {
@@ -55,6 +58,18 @@ class SupabaseClientService {
         logLevel: supa.RealtimeLogLevel.info,
       ),
     );
+
+    _healthResult = await SupabaseHealthCheck.verify();
+
+    if (!_healthResult!.isHealthy) {
+      AppLogger.error(
+        'Supabase health check failed',
+        _healthResult!.message,
+      );
+      _initialized = true;
+      _connected = false;
+      return;
+    }
 
     _initialized = true;
     _connected = true;

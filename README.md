@@ -89,7 +89,7 @@ lib/
    # Edit env.local.json with your Supabase URL and publishable key
    ```
 
-   See [DEPLOYMENT.md](DEPLOYMENT.md) for production setup.
+   See [SETUP.md](SETUP.md) for credential placement and [docs/SUPABASE.md](docs/SUPABASE.md) for the full integration guide.
 
 3. Set up Supabase project and run migrations (see [supabase/README.md](supabase/README.md))
 4. Install dependencies:
@@ -169,12 +169,13 @@ All business tables include UUID primary keys, `created_at`/`updated_at` audit t
 
 | Service | File | Responsibility |
 |---------|------|----------------|
-| **Client** | `lib/data/services/supabase_client_service.dart` | SDK initialization from env vars |
+| **Client** | `lib/data/services/supabase_client_service.dart` | SDK initialization, PKCE auth, health check |
 | **Auth** | `lib/data/services/supabase_auth_service.dart` | Sign in, sign out, password reset |
 | **Database** | `lib/data/services/supabase_database_service.dart` | PostgreSQL queries via PostgREST |
 | **Storage** | `lib/data/services/supabase_storage_service.dart` | File uploads and signed URLs |
+| **Health** | `lib/data/services/supabase_health_check.dart` | Startup connectivity validation |
 
-Configuration is loaded exclusively via `EnvConfig` (`lib/core/config/env_config.dart`).
+See [docs/SUPABASE.md](docs/SUPABASE.md) for Auth, PostgreSQL, and Storage setup.
 
 ## Architecture
 

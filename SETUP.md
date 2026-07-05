@@ -141,15 +141,16 @@ Do **not** put production secrets in `assets/.env` — it is bundled into the ap
 
 ```
 dm-auto-os/
-├── env.production.json     ← PUT PRODUCTION CREDENTIALS HERE (gitignored)
-├── env.example.json        ← template (committed)
+├── env.production.json          ← PUT PRODUCTION CREDENTIALS HERE (gitignored)
+├── env.production.json.example  ← template (committed)
+├── env.example.json             ← alternate template (committed)
 └── ...
 ```
 
 **Steps:**
 
 ```bash
-cp env.example.json env.production.json
+cp env.production.json.example env.production.json
 # Edit env.production.json with production Supabase project values
 ```
 
@@ -243,7 +244,8 @@ Set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` as **masked/protected** CI var
 | `env.local.json` | **No** (gitignored) | Local development credentials |
 | `env.production.json` | **No** (gitignored) | Production build credentials |
 | `env.local.json.example` | Yes | Template for local setup |
-| `env.example.json` | Yes | Template for production setup |
+| `env.production.json.example` | Yes | Template for production setup |
+| `env.example.json` | Yes | Alternate production template |
 | `assets/.env.example` | Yes | Placeholder fallback (demo mode) |
 | `assets/.env` | **No** (gitignored) | Optional local override (not recommended) |
 
@@ -278,6 +280,7 @@ If you see **Demo mode**, credentials were not loaded. Check:
 
 ## Next steps
 
-1. [DEPLOYMENT.md](DEPLOYMENT.md) — full Supabase project setup, auth, storage, migrations
-2. [supabase/README.md](supabase/README.md) — database schema reference
-3. [ROADMAP.md](ROADMAP.md) — development priorities
+1. [docs/SUPABASE.md](docs/SUPABASE.md) — full Auth, database, and storage integration guide
+2. [DEPLOYMENT.md](DEPLOYMENT.md) — Supabase project setup, migrations, production builds
+3. [supabase/README.md](supabase/README.md) — database schema reference
+4. [ROADMAP.md](ROADMAP.md) — development priorities
