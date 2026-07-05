@@ -89,9 +89,10 @@ lib/
    ```bash
    flutter pub get
    ```
-5. Run database migrations in your Supabase SQL editor:
+5. Run database migrations in your Supabase SQL editor (in order):
    ```
    supabase/migrations/001_initial_schema.sql
+   supabase/migrations/002_financial_operations_schema.sql
    ```
 6. Run the app:
    ```bash
@@ -107,7 +108,7 @@ Without Supabase configuration, the app runs in demo mode:
 
 ## Database Schema
 
-The initial migration creates:
+### Core tables (`001_initial_schema.sql`)
 - `profiles` — user profiles with roles
 - `vehicles` — fleet inventory
 - `customers` — customer records
@@ -115,7 +116,25 @@ The initial migration creates:
 - `service_orders` — maintenance/repair orders
 - `vehicle_sales` — trading/sales records
 
-Row Level Security (RLS) policies enforce role-based data access at the database level.
+### Financial & operations (`002_financial_operations_schema.sql`)
+- `drivers` — licensed drivers assignable to rentals
+- `rental_periods` — billing/contract periods grouping multiple rentals
+- `transactions` — income & expense ledger (XAF)
+- `expenses` — vehicle-specific costs (linked to vehicles, optional transaction)
+- `documents` — file attachments for vehicles, customers, rentals, or transactions
+- `reports` — saved and generated business reports
+
+### Relationships
+```
+vehicles 1──* expenses
+vehicles 1──* rentals
+customers 1──* rentals
+rental_periods 1──* rentals
+vehicles/customers/rentals/transactions 1──* documents
+expenses *──1 transactions (optional)
+```
+
+All business tables include UUID primary keys, `created_at`/`updated_at` audit timestamps, and `deleted_at` soft deletes. Row Level Security (RLS) policies enforce role-based access and hide soft-deleted records from non-administrators.
 
 ## Architecture
 
