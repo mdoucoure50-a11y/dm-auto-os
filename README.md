@@ -82,24 +82,11 @@ lib/
 ### Setup
 
 1. Clone the repository
-2. Configure Supabase credentials (choose one method):
+2. Configure Supabase credentials — see **[SETUP.md](SETUP.md)** for exactly where to place `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`:
 
-   **Option A — recommended (dart-define-from-file):**
    ```bash
    cp env.local.json.example env.local.json
-   # Edit env.local.json with your Supabase URL and anon key
-   ```
-
-   **Option B — dotenv fallback:**
-   ```bash
-   cp assets/.env.example assets/.env.local
-   # Use dart-define-from-file for real credentials in all environments
-   ```
-
-   Required variables (placeholders only in repo):
-   ```
-   SUPABASE_URL=https://your-project.supabase.co
-   SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+   # Edit env.local.json with your Supabase URL and publishable key
    ```
 
    See [DEPLOYMENT.md](DEPLOYMENT.md) for production setup.

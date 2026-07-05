@@ -1,5 +1,7 @@
 # DM Auto OS — Production Deployment
 
+> **Setup credentials first:** See [SETUP.md](SETUP.md) for exactly where to place `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` for local and production environments.
+
 All secrets are supplied via **environment variables**. No credentials are hardcoded in the application.
 
 ## Required environment variables
@@ -18,6 +20,8 @@ Placeholders are in:
 
 ## Local development
 
+See [SETUP.md](SETUP.md) for the full local setup guide. Quick start:
+
 ```bash
 cp env.local.json.example env.local.json
 # Edit env.local.json with your Supabase credentials
@@ -26,21 +30,13 @@ chmod +x scripts/run_dev.sh
 ./scripts/run_dev.sh
 ```
 
-Or manually:
-
-```bash
-flutter run --dart-define-from-file=env.local.json
-```
-
-Without credentials, the app runs in **demo mode** (offline auth).
-
 ## Supabase project setup
 
 ### 1. Create project
 
 1. Create a project at [supabase.com](https://supabase.com)
 2. Copy **Project URL** → `SUPABASE_URL`
-3. Copy **anon public** key → `SUPABASE_PUBLISHABLE_KEY`
+3. Copy **publishable** key → `SUPABASE_PUBLISHABLE_KEY`
 
 ### 2. Run database migrations
 
