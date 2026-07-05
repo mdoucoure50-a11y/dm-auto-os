@@ -55,6 +55,32 @@ class RentalPeriodReportView extends StatelessWidget {
           metricValue: report.mostUtilizedRentalDays?.toString() ?? '—',
         ),
         const SizedBox(height: 20),
+        Text('Profitability by Mission', style: theme.textTheme.titleMedium),
+        const SizedBox(height: 8),
+        if (report.missionStats.isEmpty)
+          const Card(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Text('No mission-assigned rentals in this period.'),
+            ),
+          )
+        else ...[
+          if (report.mostProfitableMission != null)
+            _RankingCard(
+              title: 'Most Profitable Mission',
+              icon: Icons.flag_outlined,
+              vehicleLabel: report.mostProfitableMission!.missionName,
+              metricLabel: 'Profit',
+              metricValue: CurrencyFormatter.formatXaf(
+                report.mostProfitableMission!.profitXaf,
+              ),
+            ),
+          const SizedBox(height: 8),
+          ...report.missionStats.map(
+            (stat) => _MissionStatCard(stat: stat),
+          ),
+        ],
+        const SizedBox(height: 20),
         Text('Per Vehicle', style: theme.textTheme.titleMedium),
         const SizedBox(height: 8),
         if (report.vehicleStats.isEmpty)
@@ -183,6 +209,74 @@ class _RankingCard extends StatelessWidget {
             Text(
               metricValue,
               style: Theme.of(context).textTheme.titleSmall,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MissionStatCard extends StatelessWidget {
+  const _MissionStatCard({required this.stat});
+
+  final MissionPeriodStat stat;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    stat.missionName,
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                ),
+                if (stat.profitRank == 1)
+                  const Icon(Icons.emoji_events, color: Colors.amber, size: 18),
+              ],
+            ),
+            if (stat.missionCode != null) ...[
+              const SizedBox(height: 2),
+              Text(
+                stat.missionCode!,
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+            ],
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: _MiniStat(
+                    label: 'Revenue',
+                    value: CurrencyFormatter.formatXaf(stat.revenueXaf),
+                  ),
+                ),
+                Expanded(
+                  child: _MiniStat(
+                    label: 'Expenses',
+                    value: CurrencyFormatter.formatXaf(stat.expensesXaf),
+                  ),
+                ),
+                Expanded(
+                  child: _MiniStat(
+                    label: 'Profit',
+                    value: CurrencyFormatter.formatXaf(stat.profitXaf),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '${stat.rentalCount} rentals · ${stat.rentalDays} days',
+              style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
         ),

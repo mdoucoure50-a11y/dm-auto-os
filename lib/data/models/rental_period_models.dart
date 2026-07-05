@@ -159,6 +159,60 @@ class VehiclePeriodStatModel {
       );
 }
 
+class MissionPeriodStatModel {
+  MissionPeriodStatModel({
+    required this.id,
+    this.missionId,
+    required this.missionName,
+    this.missionCode,
+    required this.revenueXaf,
+    required this.expensesXaf,
+    required this.profitXaf,
+    required this.rentalCount,
+    required this.rentalDays,
+    this.profitRank,
+  });
+
+  factory MissionPeriodStatModel.fromJson(Map<String, dynamic> json) {
+    return MissionPeriodStatModel(
+      id: json['id'] as String,
+      missionId: json['mission_id'] as String?,
+      missionName: json['mission_name'] as String,
+      missionCode: json['mission_code'] as String?,
+      revenueXaf: (json['revenue_xaf'] as num).toInt(),
+      expensesXaf: (json['expenses_xaf'] as num).toInt(),
+      profitXaf: (json['profit_xaf'] as num).toInt(),
+      rentalCount: (json['rental_count'] as num).toInt(),
+      rentalDays: (json['rental_days'] as num).toInt(),
+      profitRank: (json['profit_rank'] as num?)?.toInt(),
+    );
+  }
+
+  final String id;
+  final String? missionId;
+  final String missionName;
+  final String? missionCode;
+  final int revenueXaf;
+  final int expensesXaf;
+  final int profitXaf;
+  final int rentalCount;
+  final int rentalDays;
+  final int? profitRank;
+
+  MissionPeriodStat toEntity() => MissionPeriodStat(
+        id: id,
+        missionId: missionId,
+        missionName: missionName,
+        missionCode: missionCode,
+        revenueXaf: revenueXaf,
+        expensesXaf: expensesXaf,
+        profitXaf: profitXaf,
+        rentalCount: rentalCount,
+        rentalDays: rentalDays,
+        profitRank: profitRank,
+      );
+}
+
 class RentalPeriodReportModel {
   RentalPeriodReportModel({
     required this.id,
@@ -171,6 +225,7 @@ class RentalPeriodReportModel {
     required this.netProfitXaf,
     required this.rentalCount,
     required this.vehicleStats,
+    required this.missionStats,
     this.closingNotes,
     this.mostProfitableVehicleId,
     this.mostProfitableVehicleLabel,
@@ -185,6 +240,7 @@ class RentalPeriodReportModel {
   factory RentalPeriodReportModel.fromJson(
     Map<String, dynamic> json, {
     List<VehiclePeriodStatModel> vehicleStats = const [],
+    List<MissionPeriodStatModel> missionStats = const [],
   }) {
     return RentalPeriodReportModel(
       id: json['id'] as String,
@@ -198,6 +254,7 @@ class RentalPeriodReportModel {
       netProfitXaf: (json['net_profit_xaf'] as num).toInt(),
       rentalCount: (json['rental_count'] as num).toInt(),
       vehicleStats: vehicleStats,
+      missionStats: missionStats,
       closingNotes: json['closing_notes'] as String?,
       mostProfitableVehicleId: json['most_profitable_vehicle_id'] as String?,
       mostProfitableVehicleLabel:
@@ -225,6 +282,7 @@ class RentalPeriodReportModel {
   final int netProfitXaf;
   final int rentalCount;
   final List<VehiclePeriodStatModel> vehicleStats;
+  final List<MissionPeriodStatModel> missionStats;
   final String? closingNotes;
   final String? mostProfitableVehicleId;
   final String? mostProfitableVehicleLabel;
@@ -246,6 +304,7 @@ class RentalPeriodReportModel {
         netProfitXaf: netProfitXaf,
         rentalCount: rentalCount,
         vehicleStats: vehicleStats.map((stat) => stat.toEntity()).toList(),
+        missionStats: missionStats.map((stat) => stat.toEntity()).toList(),
         closingNotes: closingNotes,
         mostProfitableVehicleId: mostProfitableVehicleId,
         mostProfitableVehicleLabel: mostProfitableVehicleLabel,

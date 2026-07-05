@@ -178,6 +178,8 @@ class RentalPeriodRepositoryImpl implements RentalPeriodRepository {
       ),
     ];
 
+    final missionStats = _demoMissionStats();
+
     final report = RentalPeriodReport(
       id: reportId,
       rentalPeriodId: periodId,
@@ -189,6 +191,7 @@ class RentalPeriodRepositoryImpl implements RentalPeriodRepository {
       netProfitXaf: revenue - expenses,
       rentalCount: 3,
       vehicleStats: vehicleStats,
+      missionStats: missionStats,
       closingNotes: closingNotes,
       mostProfitableVehicleId: 'demo-vehicle-1',
       mostProfitableVehicleLabel: 'Toyota Hilux (CE-1234-A)',
@@ -268,6 +271,45 @@ class RentalPeriodRepositoryImpl implements RentalPeriodRepository {
     ];
   }
 
+  static List<MissionPeriodStat> _demoMissionStats() => const [
+        MissionPeriodStat(
+          id: 'demo-mission-stat-1',
+          missionId: 'demo-mission-au',
+          missionName: 'African Union Summit',
+          missionCode: 'au-summit',
+          revenueXaf: 120000,
+          expensesXaf: 25000,
+          profitXaf: 95000,
+          rentalCount: 1,
+          rentalDays: 7,
+          profitRank: 1,
+        ),
+        MissionPeriodStat(
+          id: 'demo-mission-stat-2',
+          missionId: 'demo-mission-comilog',
+          missionName: 'COMILOG Contract',
+          missionCode: 'comilog',
+          revenueXaf: 90000,
+          expensesXaf: 30000,
+          profitXaf: 60000,
+          rentalCount: 1,
+          rentalDays: 4,
+          profitRank: 2,
+        ),
+        MissionPeriodStat(
+          id: 'demo-mission-stat-3',
+          missionId: 'demo-mission-airport',
+          missionName: 'Airport Transfer',
+          missionCode: 'airport-transfer',
+          revenueXaf: 60000,
+          expensesXaf: 30000,
+          profitXaf: 30000,
+          rentalCount: 1,
+          rentalDays: 3,
+          profitRank: 3,
+        ),
+      ];
+
   static Map<String, RentalPeriodReport> _seedDemoReports() {
     final now = DateTime.now();
     final vehicleStats = [
@@ -311,6 +353,7 @@ class RentalPeriodRepositoryImpl implements RentalPeriodRepository {
         netProfitXaf: 185000,
         rentalCount: 3,
         vehicleStats: vehicleStats,
+        missionStats: _demoMissionStats(),
         mostProfitableVehicleId: 'demo-vehicle-1',
         mostProfitableVehicleLabel: 'Toyota Hilux (CE-1234-A)',
         mostProfitableVehicleProfitXaf: 130000,

@@ -13,6 +13,7 @@ import '../../features/drivers/presentation/screens/drivers_screen.dart';
 import '../../features/rental_periods/presentation/screens/rental_period_detail_screen.dart';
 import '../../features/rental_periods/presentation/screens/rental_period_form_screen.dart';
 import '../../features/rental_periods/presentation/screens/rental_periods_screen.dart';
+import '../../features/rentals/presentation/screens/rental_form_screen.dart';
 import '../../features/rentals/presentation/screens/rentals_screen.dart';
 import '../../features/reports/presentation/screens/reports_screen.dart';
 import '../../features/services/presentation/screens/services_screen.dart';
@@ -95,6 +96,13 @@ final routerProvider = Provider<GoRouter>((ref) {
             pageBuilder: (context, state) => const NoTransitionPage(
               child: RentalsScreen(),
             ),
+            routes: [
+              GoRoute(
+                path: 'new',
+                name: 'rentalNew',
+                builder: (context, state) => const RentalFormScreen(),
+              ),
+            ],
           ),
           GoRoute(
             path: AppRoutes.cashbook,

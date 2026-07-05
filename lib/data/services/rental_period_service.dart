@@ -89,8 +89,13 @@ class RentalPeriodService {
       ) as Map<String, dynamic>;
 
       final report = RentalPeriodReportModel.fromJson(row);
-      final stats = await fetchVehicleStats(report.id);
-      return RentalPeriodReportModel.fromJson(row, vehicleStats: stats);
+      final vehicleStats = await fetchVehicleStats(report.id);
+      final missionStats = await fetchMissionStats(report.id);
+      return RentalPeriodReportModel.fromJson(
+        row,
+        vehicleStats: vehicleStats,
+        missionStats: missionStats,
+      );
     }, errorMessage: 'Failed to close rental period');
   }
 
@@ -106,8 +111,13 @@ class RentalPeriodService {
 
       if (row == null) return null;
 
-      final stats = await fetchVehicleStats(row['id'] as String);
-      return RentalPeriodReportModel.fromJson(row, vehicleStats: stats);
+      final vehicleStats = await fetchVehicleStats(row['id'] as String);
+      final missionStats = await fetchMissionStats(row['id'] as String);
+      return RentalPeriodReportModel.fromJson(
+        row,
+        vehicleStats: vehicleStats,
+        missionStats: missionStats,
+      );
     }, errorMessage: 'Failed to load period report');
   }
 
@@ -121,8 +131,13 @@ class RentalPeriodService {
 
       if (row == null) return null;
 
-      final stats = await fetchVehicleStats(reportId);
-      return RentalPeriodReportModel.fromJson(row, vehicleStats: stats);
+      final vehicleStats = await fetchVehicleStats(reportId);
+      final missionStats = await fetchMissionStats(reportId);
+      return RentalPeriodReportModel.fromJson(
+        row,
+        vehicleStats: vehicleStats,
+        missionStats: missionStats,
+      );
     }, errorMessage: 'Failed to load report');
   }
 
@@ -135,11 +150,31 @@ class RentalPeriodService {
 
       final reports = <RentalPeriodReportModel>[];
       for (final row in rows.cast<Map<String, dynamic>>()) {
-        final stats = await fetchVehicleStats(row['id'] as String);
-        reports.add(RentalPeriodReportModel.fromJson(row, vehicleStats: stats));
+        final vehicleStats = await fetchVehicleStats(row['id'] as String);
+        final missionStats = await fetchMissionStats(row['id'] as String);
+        reports.add(RentalPeriodReportModel.fromJson(
+          row,
+          vehicleStats: vehicleStats,
+          missionStats: missionStats,
+        ));
       }
       return reports;
     }, errorMessage: 'Failed to load reports');
+  }
+
+  Future<List<MissionPeriodStatModel>> fetchMissionStats(String reportId) async {
+    return _databaseService.execute(() async {
+      final rows = await _databaseService
+          .from('rental_period_mission_stats')
+          .select()
+          .eq('report_id', reportId)
+          .order('profit_rank', ascending: true) as List<dynamic>;
+
+      return rows
+          .cast<Map<String, dynamic>>()
+          .map(MissionPeriodStatModel.fromJson)
+          .toList();
+    }, errorMessage: 'Failed to load mission stats');
   }
 
   Future<List<VehiclePeriodStatModel>> fetchVehicleStats(String reportId) async {

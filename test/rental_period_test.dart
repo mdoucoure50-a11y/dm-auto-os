@@ -70,11 +70,56 @@ void main() {
             rentalDays: 7,
           ),
         ],
+        missionStats: const [],
       );
 
       expect(report.mostProfitableVehicle?.vehicleId, 'v1');
       expect(report.mostUtilizedVehicle?.rentalDays, 14);
       expect(report.netProfitXaf, 185000);
+    });
+
+    test('identifies most profitable mission', () {
+      final report = RentalPeriodReport(
+        id: 'r1',
+        rentalPeriodId: 'p1',
+        periodName: 'June 2026',
+        periodStart: _start,
+        periodEnd: _end,
+        totalRentalRevenueXaf: 270000,
+        totalRentalExpensesXaf: 85000,
+        netProfitXaf: 185000,
+        rentalCount: 3,
+        vehicleStats: const [],
+        missionStats: const [
+          MissionPeriodStat(
+            id: 'ms1',
+            missionId: 'm1',
+            missionName: 'African Union Summit',
+            missionCode: 'au-summit',
+            revenueXaf: 120000,
+            expensesXaf: 25000,
+            profitXaf: 95000,
+            rentalCount: 1,
+            rentalDays: 7,
+            profitRank: 1,
+          ),
+          MissionPeriodStat(
+            id: 'ms2',
+            missionId: 'm2',
+            missionName: 'COMILOG Contract',
+            missionCode: 'comilog',
+            revenueXaf: 90000,
+            expensesXaf: 30000,
+            profitXaf: 60000,
+            rentalCount: 1,
+            rentalDays: 4,
+            profitRank: 2,
+          ),
+        ],
+      );
+
+      expect(report.mostProfitableMission?.missionName, 'African Union Summit');
+      expect(report.mostProfitableMission?.profitXaf, 95000);
     });
   });
 

@@ -15,6 +15,7 @@ Run these files **in order** in the Supabase SQL editor:
 | 5 | `migrations/005_storage_buckets.sql` | Storage buckets + RLS policies |
 | 6 | `migrations/006_cashbook_module.sql` | Multi-currency, daily/period summaries |
 | 7 | `migrations/007_rental_period_closing.sql` | Period closing reports, open/close RPCs |
+| 8 | `migrations/008_mission_rentals.sql` | Missions, rental links, mission profitability |
 
 ## Entity relationship diagram
 

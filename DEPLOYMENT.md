@@ -53,6 +53,7 @@ supabase/migrations/004_schema_grants_and_comments.sql
 supabase/migrations/005_storage_buckets.sql
 supabase/migrations/006_cashbook_module.sql
 supabase/migrations/007_rental_period_closing.sql
+supabase/migrations/008_mission_rentals.sql
 ```
 
 This configures:

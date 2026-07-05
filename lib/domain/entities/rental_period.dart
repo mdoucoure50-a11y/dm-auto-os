@@ -129,6 +129,38 @@ class VehiclePeriodStat extends Equatable {
   List<Object?> get props => [vehicleId, profitXaf, rentalDays];
 }
 
+/// Per-mission profitability within a closed rental period.
+class MissionPeriodStat extends Equatable {
+  const MissionPeriodStat({
+    required this.id,
+    this.missionId,
+    required this.missionName,
+    this.missionCode,
+    required this.revenueXaf,
+    required this.expensesXaf,
+    required this.profitXaf,
+    required this.rentalCount,
+    required this.rentalDays,
+    this.profitRank,
+  });
+
+  final String id;
+  final String? missionId;
+  final String missionName;
+  final String? missionCode;
+  final int revenueXaf;
+  final int expensesXaf;
+  final int profitXaf;
+  final int rentalCount;
+  final int rentalDays;
+  final int? profitRank;
+
+  bool get isUnassigned => missionId == null;
+
+  @override
+  List<Object?> get props => [missionId, profitXaf];
+}
+
 /// Permanent closing report for a rental period.
 class RentalPeriodReport extends Equatable {
   const RentalPeriodReport({
@@ -142,6 +174,7 @@ class RentalPeriodReport extends Equatable {
     required this.netProfitXaf,
     required this.rentalCount,
     required this.vehicleStats,
+    required this.missionStats,
     this.closingNotes,
     this.mostProfitableVehicleId,
     this.mostProfitableVehicleLabel,
@@ -163,6 +196,7 @@ class RentalPeriodReport extends Equatable {
   final int netProfitXaf;
   final int rentalCount;
   final List<VehiclePeriodStat> vehicleStats;
+  final List<MissionPeriodStat> missionStats;
   final String? closingNotes;
   final String? mostProfitableVehicleId;
   final String? mostProfitableVehicleLabel;
@@ -184,6 +218,13 @@ class RentalPeriodReport extends Equatable {
     if (vehicleStats.isEmpty) return null;
     return vehicleStats.reduce(
       (best, stat) => stat.rentalDays > best.rentalDays ? stat : best,
+    );
+  }
+
+  MissionPeriodStat? get mostProfitableMission {
+    if (missionStats.isEmpty) return null;
+    return missionStats.reduce(
+      (best, stat) => stat.profitXaf > best.profitXaf ? stat : best,
     );
   }
 
