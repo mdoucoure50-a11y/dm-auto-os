@@ -13,6 +13,7 @@ Run these files **in order** in the Supabase SQL editor:
 | 3 | `migrations/003_module_priorities.sql` | Period closing, cashbook view, profitability view, optional workshop |
 | 4 | `migrations/004_schema_grants_and_comments.sql` | Grants, comments, index hardening |
 | 5 | `migrations/005_storage_buckets.sql` | Storage buckets + RLS policies |
+| 6 | `migrations/006_cashbook_module.sql` | Multi-currency, daily/period summaries |
 
 ## Entity relationship diagram
 

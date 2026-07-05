@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/cashbook/presentation/screens/cashbook_entry_form_screen.dart';
 import '../../features/cashbook/presentation/screens/cashbook_screen.dart';
 import '../../features/customers/presentation/screens/customers_screen.dart';
 import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
@@ -22,6 +23,7 @@ import '../../features/vehicles/presentation/screens/vehicles_screen.dart';
 import '../../providers/auth_provider.dart';
 import '../permissions/permission_guard.dart';
 import 'app_routes.dart';
+import '../../domain/entities/cashbook.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -98,6 +100,31 @@ final routerProvider = Provider<GoRouter>((ref) {
             pageBuilder: (context, state) => const NoTransitionPage(
               child: CashbookScreen(),
             ),
+            routes: [
+              GoRoute(
+                path: 'new',
+                name: 'cashbookNew',
+                builder: (context, state) {
+                  final type = state.uri.queryParameters['type'] ?? 'income';
+                  return CashbookEntryFormScreen(
+                    entryType: type == 'expense'
+                        ? CashbookEntryType.expense
+                        : CashbookEntryType.income,
+                  );
+                },
+              ),
+              GoRoute(
+                path: ':id/edit',
+                name: 'cashbookEdit',
+                builder: (context, state) {
+                  final id = state.pathParameters['id']!;
+                  return CashbookEntryFormScreen(
+                    entryId: id,
+                    entryType: CashbookEntryType.income,
+                  );
+                },
+              ),
+            ],
           ),
           GoRoute(
             path: AppRoutes.rentalPeriods,
