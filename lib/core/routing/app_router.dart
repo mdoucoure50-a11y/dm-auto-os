@@ -10,6 +10,8 @@ import '../../features/customers/presentation/screens/customers_screen.dart';
 import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
 import '../../features/documents/presentation/screens/documents_screen.dart';
 import '../../features/drivers/presentation/screens/drivers_screen.dart';
+import '../../features/rental_periods/presentation/screens/rental_period_detail_screen.dart';
+import '../../features/rental_periods/presentation/screens/rental_period_form_screen.dart';
 import '../../features/rental_periods/presentation/screens/rental_periods_screen.dart';
 import '../../features/rentals/presentation/screens/rentals_screen.dart';
 import '../../features/reports/presentation/screens/reports_screen.dart';
@@ -132,6 +134,36 @@ final routerProvider = Provider<GoRouter>((ref) {
             pageBuilder: (context, state) => const NoTransitionPage(
               child: RentalPeriodsScreen(),
             ),
+            routes: [
+              GoRoute(
+                path: 'open',
+                name: 'rentalPeriodOpen',
+                builder: (context, state) => const RentalPeriodFormScreen(),
+              ),
+              GoRoute(
+                path: ':id',
+                name: 'rentalPeriodDetail',
+                builder: (context, state) => RentalPeriodDetailScreen(
+                  periodId: state.pathParameters['id']!,
+                ),
+                routes: [
+                  GoRoute(
+                    path: 'close',
+                    name: 'rentalPeriodClose',
+                    builder: (context, state) => RentalPeriodCloseScreen(
+                      periodId: state.pathParameters['id']!,
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'report',
+                    name: 'rentalPeriodReport',
+                    builder: (context, state) => RentalPeriodReportScreen(
+                      periodId: state.pathParameters['id']!,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
           GoRoute(
             path: AppRoutes.vehicleProfitability,
