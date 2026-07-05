@@ -2,19 +2,25 @@ import 'dart:typed_data';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../core/constants/app_constants.dart';
 import '../../core/constants/storage_constants.dart';
 import '../../core/errors/app_exception.dart';
-import 'supabase_service.dart';
+import 'supabase_client_service.dart';
 
-/// Upload and manage files in Supabase Storage.
+/// Supabase Storage service for documents and vehicle photos.
 class SupabaseStorageService {
-  const SupabaseStorageService();
+  SupabaseStorageService({required SupabaseClientService clientService})
+      : _clientService = clientService;
+
+  final SupabaseClientService _clientService;
+
+  bool get isAvailable => _clientService.isConnected;
 
   StorageFileApi _bucket(String bucket) {
-    if (!SupabaseService.isConnected) {
+    if (!_clientService.isConnected) {
       throw const NetworkException('Storage requires Supabase connection');
     }
-    return SupabaseService.storage.from(bucket);
+    return _clientService.client.storage.from(bucket);
   }
 
   /// Uploads a document file and returns the storage path.
@@ -35,7 +41,7 @@ class SupabaseStorageService {
       throw const ValidationException('File exceeds maximum size of 50 MB');
     }
 
-    return SupabaseService.execute(() async {
+    return _execute(() async {
       await _bucket(StorageConstants.documentsBucket).uploadBinary(
         path,
         bytes,
@@ -65,7 +71,7 @@ class SupabaseStorageService {
       throw const ValidationException('Photo exceeds maximum size of 10 MB');
     }
 
-    return SupabaseService.execute(() async {
+    return _execute(() async {
       await _bucket(StorageConstants.vehiclePhotosBucket).uploadBinary(
         path,
         bytes,
@@ -84,7 +90,7 @@ class SupabaseStorageService {
     required String path,
     int expiresInSeconds = 3600,
   }) async {
-    return SupabaseService.execute(() async {
+    return _execute(() async {
       return _bucket(bucket).createSignedUrl(path, expiresInSeconds);
     }, errorMessage: 'Failed to create signed URL');
   }
@@ -94,8 +100,25 @@ class SupabaseStorageService {
     required String bucket,
     required String path,
   }) async {
-    await SupabaseService.execute(() async {
+    await _execute(() async {
       await _bucket(bucket).remove([path]);
     }, errorMessage: 'Failed to delete file');
+  }
+
+  Future<T> _execute<T>(
+    Future<T> Function() operation, {
+    String? errorMessage,
+  }) async {
+    try {
+      return await operation().timeout(AppConstants.networkTimeout);
+    } on StorageException catch (e) {
+      throw NetworkException(
+        errorMessage ?? e.message,
+        code: e.statusCode,
+      );
+    } catch (e) {
+      if (e is AppException) rethrow;
+      throw NetworkException(errorMessage ?? e.toString());
+    }
   }
 }

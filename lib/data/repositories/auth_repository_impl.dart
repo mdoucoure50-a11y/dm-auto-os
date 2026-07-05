@@ -1,17 +1,23 @@
 import 'dart:async';
 
-import 'package:supabase_flutter/supabase_flutter.dart' hide AuthException;
-
 import '../../core/errors/app_exception.dart';
 import '../../core/permissions/user_role.dart';
 import '../../core/utils/logger.dart';
 import '../../domain/entities/app_user.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../datasources/supabase_service.dart';
 import '../models/user_profile_model.dart';
+import '../services/supabase_auth_service.dart';
+import '../services/supabase_database_service.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  AuthRepositoryImpl();
+  AuthRepositoryImpl({
+    required SupabaseAuthService authService,
+    required SupabaseDatabaseService databaseService,
+  })  : _authService = authService,
+        _databaseService = databaseService;
+
+  final SupabaseAuthService _authService;
+  final SupabaseDatabaseService _databaseService;
 
   final _authController = StreamController<AppUser?>.broadcast();
   AppUser? _cachedUser;
@@ -21,15 +27,6 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   AppUser? get currentUser => _cachedUser;
-
-  GoTrueClient? get _auth {
-    if (!SupabaseService.isInitialized) return null;
-    try {
-      return SupabaseService.auth;
-    } catch (_) {
-      return null;
-    }
-  }
 
   void _emit(AppUser? user) {
     _cachedUser = user;
@@ -41,62 +38,47 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String password,
   }) async {
-    final auth = _auth;
-    if (auth == null) {
+    if (!_authService.isAvailable) {
       return _demoSignIn(email);
     }
 
-    return SupabaseService.execute(() async {
-      final response = await auth.signInWithPassword(
-        email: email.trim(),
-        password: password,
-      );
+    final response = await _authService.signInWithPassword(
+      email: email,
+      password: password,
+    );
 
-      final user = response.user;
-      if (user == null) {
-        throw const AuthException('Sign in failed. Please try again.');
-      }
+    final user = response.user;
+    if (user == null) {
+      throw const AuthException('Sign in failed. Please try again.');
+    }
 
-      final profile = await _fetchProfile(user.id);
-      final appUser = _mapToAppUser(profile);
-      _emit(appUser);
-      return appUser;
-    }, errorMessage: 'Unable to sign in');
+    final profile = await _fetchProfile(user.id);
+    final appUser = _mapToAppUser(profile);
+    _emit(appUser);
+    return appUser;
   }
 
   @override
   Future<void> signOut() async {
-    final auth = _auth;
-    if (auth != null) {
-      await auth.signOut();
+    if (_authService.isAvailable) {
+      await _authService.signOut();
     }
     _emit(null);
   }
 
   @override
   Future<void> sendPasswordResetEmail(String email) async {
-    final auth = _auth;
-    if (auth == null) {
-      throw const NetworkException(
-        'Password reset requires Supabase configuration',
-      );
-    }
-
-    await SupabaseService.execute(
-      () => auth.resetPasswordForEmail(email.trim()),
-      errorMessage: 'Unable to send reset email',
-    );
+    await _authService.resetPasswordForEmail(email);
   }
 
   @override
   Future<AppUser> refreshProfile() async {
-    final auth = _auth;
-    if (auth == null) {
+    if (!_authService.isAvailable) {
       if (_cachedUser != null) return _cachedUser!;
       throw const AuthException('Not authenticated');
     }
 
-    final session = auth.currentSession;
+    final session = _authService.currentSession;
     if (session == null) {
       throw const AuthException('Not authenticated');
     }
@@ -108,10 +90,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   Future<UserProfileModel> _fetchProfile(String userId) async {
-    final data = await SupabaseService.table('profiles')
-        .select()
-        .eq('id', userId)
-        .maybeSingle();
+    final data = await _databaseService.fetchById('profiles', userId);
 
     if (data == null) {
       throw const NotFoundException('User profile not found');
@@ -136,7 +115,6 @@ class AuthRepositoryImpl implements AuthRepository {
     );
   }
 
-  /// Demo mode sign-in when Supabase is not configured.
   Future<AppUser> _demoSignIn(String email) async {
     AppLogger.info('Demo mode sign-in for: $email');
     await Future<void>.delayed(const Duration(milliseconds: 800));
@@ -155,10 +133,9 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   void listenToAuthChanges() {
-    final auth = _auth;
-    if (auth == null) return;
+    if (!_authService.isAvailable) return;
 
-    auth.onAuthStateChange.listen((event) async {
+    _authService.onAuthStateChange.listen((event) async {
       final session = event.session;
       if (session == null) {
         _emit(null);

@@ -2,34 +2,64 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../core/config/env_config.dart';
-import '../data/datasources/supabase_service.dart';
-import '../data/datasources/supabase_storage_service.dart';
+import '../data/services/supabase_auth_service.dart';
+import '../data/services/supabase_client_service.dart';
+import '../data/services/supabase_database_service.dart';
+import '../data/services/supabase_storage_service.dart';
+
+// ---------------------------------------------------------------------------
+// Core client
+// ---------------------------------------------------------------------------
+
+final supabaseClientServiceProvider = Provider<SupabaseClientService>(
+  (ref) => SupabaseClientService.instance,
+);
 
 final supabaseClientProvider = Provider<SupabaseClient?>((ref) {
-  if (!SupabaseService.isConnected) return null;
+  final clientService = ref.watch(supabaseClientServiceProvider);
+  if (!clientService.isConnected) return null;
   try {
-    return SupabaseService.client;
+    return clientService.client;
   } catch (_) {
     return null;
   }
 });
 
 final isSupabaseConfiguredProvider = Provider<bool>((ref) {
-  return SupabaseService.isConnected;
+  return ref.watch(supabaseClientServiceProvider).isConnected;
 });
 
+// ---------------------------------------------------------------------------
+// Services
+// ---------------------------------------------------------------------------
+
+final supabaseAuthServiceProvider = Provider<SupabaseAuthService>((ref) {
+  return SupabaseAuthService(ref.watch(supabaseClientServiceProvider));
+});
+
+final supabaseDatabaseServiceProvider = Provider<SupabaseDatabaseService>((ref) {
+  return SupabaseDatabaseService(ref.watch(supabaseClientServiceProvider));
+});
+
+final supabaseStorageServiceProvider = Provider<SupabaseStorageService>((ref) {
+  return SupabaseStorageService(
+    clientService: ref.watch(supabaseClientServiceProvider),
+  );
+});
+
+// ---------------------------------------------------------------------------
+// Environment metadata (settings UI)
+// ---------------------------------------------------------------------------
+
 final supabaseEnvProvider = Provider<SupabaseEnvInfo>((ref) {
+  final clientService = ref.watch(supabaseClientServiceProvider);
   return SupabaseEnvInfo(
     isConfigured: EnvConfig.isSupabaseConfigured,
-    isConnected: SupabaseService.isConnected,
+    isConnected: clientService.isConnected,
     url: EnvConfig.supabaseUrlForLogs,
     documentsBucket: EnvConfig.storageDocumentsBucket,
     vehiclePhotosBucket: EnvConfig.storageVehiclePhotosBucket,
   );
-});
-
-final supabaseStorageServiceProvider = Provider<SupabaseStorageService>((ref) {
-  return const SupabaseStorageService();
 });
 
 /// Non-sensitive Supabase connection metadata for settings UI.

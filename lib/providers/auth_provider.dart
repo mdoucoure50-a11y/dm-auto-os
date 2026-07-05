@@ -5,9 +5,13 @@ import '../data/repositories/auth_repository_impl.dart';
 import '../domain/entities/app_user.dart';
 import '../domain/entities/auth_state.dart';
 import '../domain/repositories/auth_repository.dart';
+import 'supabase_provider.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  final repository = AuthRepositoryImpl();
+  final repository = AuthRepositoryImpl(
+    authService: ref.watch(supabaseAuthServiceProvider),
+    databaseService: ref.watch(supabaseDatabaseServiceProvider),
+  );
   repository.listenToAuthChanges();
   ref.onDispose(repository.dispose);
   return repository;

@@ -7,7 +7,7 @@ All secrets are supplied via **environment variables**. No credentials are hardc
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `SUPABASE_URL` | Yes | Supabase project URL (`https://<ref>.supabase.co`) |
-| `SUPABASE_ANON_KEY` | Yes | Supabase anonymous (publishable) key |
+| `SUPABASE_PUBLISHABLE_KEY` | Yes | Supabase publishable (anon) key |
 | `SUPABASE_STORAGE_DOCUMENTS_BUCKET` | No | Default: `documents` |
 | `SUPABASE_STORAGE_VEHICLE_PHOTOS_BUCKET` | No | Default: `vehicle-photos` |
 
@@ -40,7 +40,7 @@ Without credentials, the app runs in **demo mode** (offline auth).
 
 1. Create a project at [supabase.com](https://supabase.com)
 2. Copy **Project URL** → `SUPABASE_URL`
-3. Copy **anon public** key → `SUPABASE_ANON_KEY`
+3. Copy **anon public** key → `SUPABASE_PUBLISHABLE_KEY`
 
 ### 2. Run database migrations
 
@@ -110,7 +110,7 @@ Store secrets in your CI provider:
 
 ```
 SUPABASE_URL
-SUPABASE_ANON_KEY
+SUPABASE_PUBLISHABLE_KEY
 ```
 
 Build step:
@@ -119,7 +119,7 @@ Build step:
 cat > env.production.json << EOF
 {
   "SUPABASE_URL": "${SUPABASE_URL}",
-  "SUPABASE_ANON_KEY": "${SUPABASE_ANON_KEY}"
+  "SUPABASE_PUBLISHABLE_KEY": "${SUPABASE_PUBLISHABLE_KEY}"
 }
 EOF
 

@@ -92,7 +92,7 @@ class SettingsScreen extends ConsumerWidget {
                         ? 'Connected${env.url != null ? ' — ${env.url}' : ''}'
                         : env.isConfigured
                             ? 'Configured but not connected'
-                            : 'Demo mode — set SUPABASE_URL and SUPABASE_ANON_KEY',
+                            : 'Demo mode — set SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY',
                   ),
                 ),
                 if (env.isConnected) ...[

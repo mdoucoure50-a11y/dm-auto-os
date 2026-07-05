@@ -99,7 +99,7 @@ lib/
    Required variables (placeholders only in repo):
    ```
    SUPABASE_URL=https://your-project.supabase.co
-   SUPABASE_ANON_KEY=your-anon-key
+   SUPABASE_PUBLISHABLE_KEY=your-publishable-key
    ```
 
    See [DEPLOYMENT.md](DEPLOYMENT.md) for production setup.
@@ -177,6 +177,17 @@ expenses *──1 transactions (optional)
 ```
 
 All business tables include UUID primary keys, `created_at`/`updated_at` audit timestamps, and `deleted_at` soft deletes. Row Level Security (RLS) policies enforce role-based access and hide soft-deleted records from non-administrators.
+
+## Supabase services
+
+| Service | File | Responsibility |
+|---------|------|----------------|
+| **Client** | `lib/data/services/supabase_client_service.dart` | SDK initialization from env vars |
+| **Auth** | `lib/data/services/supabase_auth_service.dart` | Sign in, sign out, password reset |
+| **Database** | `lib/data/services/supabase_database_service.dart` | PostgreSQL queries via PostgREST |
+| **Storage** | `lib/data/services/supabase_storage_service.dart` | File uploads and signed URLs |
+
+Configuration is loaded exclusively via `EnvConfig` (`lib/core/config/env_config.dart`).
 
 ## Architecture
 
