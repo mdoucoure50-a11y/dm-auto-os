@@ -16,7 +16,7 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(currentUserProvider);
     final themeMode = ref.watch(themeModeProvider);
-    final isSupabaseConfigured = ref.watch(isSupabaseConfiguredProvider);
+    final env = ref.watch(supabaseEnvProvider);
 
     return ContentContainer(
       child: ListView(
@@ -81,18 +81,36 @@ class SettingsScreen extends ConsumerWidget {
               children: [
                 ListTile(
                   leading: Icon(
-                    isSupabaseConfigured
+                    env.isConnected
                         ? Icons.cloud_done
                         : Icons.cloud_off,
-                    color: isSupabaseConfigured ? Colors.green : Colors.orange,
+                    color: env.isConnected ? Colors.green : Colors.orange,
                   ),
-                  title: const Text('Database Connection'),
+                  title: const Text('Supabase'),
                   subtitle: Text(
-                    isSupabaseConfigured
-                        ? 'Connected to Supabase'
-                        : 'Demo mode (Supabase not configured)',
+                    env.isConnected
+                        ? 'Connected${env.url != null ? ' — ${env.url}' : ''}'
+                        : env.isConfigured
+                            ? 'Configured but not connected'
+                            : 'Demo mode — set SUPABASE_URL and SUPABASE_ANON_KEY',
                   ),
                 ),
+                if (env.isConnected) ...[
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.folder_outlined),
+                    title: const Text('Storage Buckets'),
+                    subtitle: Text(
+                      '${env.documentsBucket}, ${env.vehiclePhotosBucket}',
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.shield_outlined),
+                    title: const Text('Row Level Security'),
+                    subtitle: const Text('Enforced on database and storage'),
+                  ),
+                ],
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.info_outline),

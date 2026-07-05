@@ -12,6 +12,7 @@ Run these files **in order** in the Supabase SQL editor:
 | 2 | `migrations/002_financial_operations_schema.sql` | **drivers**, **rental_periods**, **transactions**, **expenses**, **documents**, **reports** + soft deletes + RLS |
 | 3 | `migrations/003_module_priorities.sql` | Period closing, cashbook view, profitability view, optional workshop |
 | 4 | `migrations/004_schema_grants_and_comments.sql` | Grants, comments, index hardening |
+| 5 | `migrations/005_storage_buckets.sql` | Storage buckets + RLS policies |
 
 ## Entity relationship diagram
 

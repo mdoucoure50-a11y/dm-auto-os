@@ -82,15 +82,29 @@ lib/
 ### Setup
 
 1. Clone the repository
-2. Copy environment file:
+2. Configure Supabase credentials (choose one method):
+
+   **Option A — recommended (dart-define-from-file):**
    ```bash
-   cp assets/.env.example assets/.env
+   cp env.local.json.example env.local.json
+   # Edit env.local.json with your Supabase URL and anon key
    ```
-3. Add your Supabase credentials to `assets/.env`:
+
+   **Option B — dotenv fallback:**
+   ```bash
+   cp assets/.env.example assets/.env.local
+   # Use dart-define-from-file for real credentials in all environments
+   ```
+
+   Required variables (placeholders only in repo):
    ```
    SUPABASE_URL=https://your-project.supabase.co
    SUPABASE_ANON_KEY=your-anon-key
    ```
+
+   See [DEPLOYMENT.md](DEPLOYMENT.md) for production setup.
+
+3. Set up Supabase project and run migrations (see [supabase/README.md](supabase/README.md))
 4. Install dependencies:
    ```bash
    flutter pub get
@@ -101,11 +115,13 @@ lib/
    supabase/migrations/002_financial_operations_schema.sql
    supabase/migrations/003_module_priorities.sql
    supabase/migrations/004_schema_grants_and_comments.sql
+   supabase/migrations/005_storage_buckets.sql
    ```
    See [supabase/README.md](supabase/README.md) for the full schema reference and ER diagram.
 6. Run the app:
    ```bash
-   flutter run
+   ./scripts/run_dev.sh
+   # or: flutter run --dart-define-from-file=env.local.json
    ```
 
 ### Demo Mode

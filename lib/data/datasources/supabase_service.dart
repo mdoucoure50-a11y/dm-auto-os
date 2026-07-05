@@ -1,6 +1,6 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supa;
 
+import '../../core/config/env_config.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/errors/app_exception.dart';
 import '../../core/utils/logger.dart';
@@ -13,39 +13,56 @@ abstract final class SupabaseService {
   static bool get isInitialized => _initialized;
   static bool get isConnected => _connected;
 
-  static supa.SupabaseClient get client => supa.Supabase.instance.client;
+  static supa.SupabaseClient get client {
+    _ensureConnected();
+    return supa.Supabase.instance.client;
+  }
 
-  static supa.GoTrueClient get auth => client.auth;
+  static supa.GoTrueClient get auth {
+    _ensureConnected();
+    return client.auth;
+  }
+
+  static supa.SupabaseStorageClient get storage {
+    _ensureConnected();
+    return client.storage;
+  }
 
   static supa.SupabaseQueryBuilder table(String name) => client.from(name);
 
-  /// Initializes Supabase with environment configuration.
+  static void _ensureConnected() {
+    if (!_connected) {
+      throw const NetworkException(
+        'Supabase is not connected. Configure SUPABASE_URL and SUPABASE_ANON_KEY.',
+      );
+    }
+  }
+
+  /// Initializes Supabase Auth, PostgreSQL client, and Storage from env vars.
   static Future<void> initialize() async {
     if (_initialized) return;
 
-    await dotenv.load(fileName: 'assets/.env');
+    await EnvConfig.load();
 
-    final url = dotenv.env['SUPABASE_URL'];
-    final anonKey = dotenv.env['SUPABASE_ANON_KEY'];
-
-    if (url == null ||
-        anonKey == null ||
-        url.isEmpty ||
-        anonKey.isEmpty ||
-        url.contains('your-project')) {
+    if (!EnvConfig.isSupabaseConfigured) {
       AppLogger.info(
-        'Supabase not configured — running in offline/demo mode',
+        'Supabase not configured — running in demo mode. '
+        'Set SUPABASE_URL and SUPABASE_ANON_KEY via --dart-define-from-file.',
       );
       _initialized = true;
       _connected = false;
       return;
     }
 
+    final url = EnvConfig.supabaseUrl!;
+    final anonKey = EnvConfig.supabaseAnonKey!;
+
     await supa.Supabase.initialize(
       url: url,
       anonKey: anonKey, // ignore: deprecated_member_use
       authOptions: const supa.FlutterAuthClientOptions(
         authFlowType: supa.AuthFlowType.pkce,
+        autoRefreshToken: true,
       ),
       realtimeClientOptions: const supa.RealtimeClientOptions(
         logLevel: supa.RealtimeLogLevel.info,
@@ -54,7 +71,7 @@ abstract final class SupabaseService {
 
     _initialized = true;
     _connected = true;
-    AppLogger.info('Supabase initialized: $url');
+    AppLogger.info('Supabase connected: ${EnvConfig.supabaseUrlForLogs}');
   }
 
   /// Wraps Supabase calls with consistent error handling.
@@ -66,6 +83,11 @@ abstract final class SupabaseService {
       return await operation().timeout(AppConstants.networkTimeout);
     } on supa.AuthException catch (e) {
       throw AuthException(e.message, code: e.code);
+    } on supa.StorageException catch (e) {
+      throw NetworkException(
+        errorMessage ?? e.message,
+        code: e.statusCode,
+      );
     } on supa.PostgrestException catch (e) {
       throw NetworkException(
         errorMessage ?? e.message,

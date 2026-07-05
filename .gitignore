@@ -39,7 +39,14 @@ app.*.symbols
 # Obfuscation related
 app.*.map.json
 
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
+# Environment / secrets (never commit real credentials)
+.env
+.env.*
+!.env.example
+env.local.json
+env.production.json
+assets/.env
+
+# Supabase local
+supabase/.branches
+supabase/.temp
