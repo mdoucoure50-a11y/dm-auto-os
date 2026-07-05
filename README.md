@@ -100,7 +100,9 @@ lib/
    supabase/migrations/001_initial_schema.sql
    supabase/migrations/002_financial_operations_schema.sql
    supabase/migrations/003_module_priorities.sql
+   supabase/migrations/004_schema_grants_and_comments.sql
    ```
+   See [supabase/README.md](supabase/README.md) for the full schema reference and ER diagram.
 6. Run the app:
    ```bash
    flutter run

@@ -98,8 +98,9 @@ Run in order:
 ```
 supabase/migrations/001_initial_schema.sql
 supabase/migrations/002_financial_operations_schema.sql
-supabase/migrations/003_module_priorities.sql
-```
+   supabase/migrations/003_module_priorities.sql
+   supabase/migrations/004_schema_grants_and_comments.sql
+   ```
 
 ---
 
